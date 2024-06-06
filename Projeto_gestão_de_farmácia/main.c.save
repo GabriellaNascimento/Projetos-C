@@ -65,11 +65,42 @@ void Incluir(){
     fclose(ArqFarma);
     return 0;
 };
-void Excluir(){};
+
+void Excluir(){
+    printf("*** Exclusão ***\n\n");
+    char Farmaco[21];
+    fflush(stdin);
+    printf("Nome do farmaco que deseja excluir: ");
+    scanf(" %[^\n]", Farmaco);
+
+    ArqFarma = fopen("Farmacos.dat", "r+b");
+    fseek(ArqFarma, 0, 0);
+    int Achou  = 0;
+    while(fread(&RgFarma, Tamanho, 1, ArqFarma)){
+        if (strcmp(RgFarma.Nome, Farmaco) == 0 && RgFarma.Preco > 0){
+            Achou = 1;
+            printf("Nome: %s\n", RgFarma.Nome);
+            printf("Valor: %.2f\n", RgFarma.Preco);
+            printf("Estoque: %d\n", RgFarma.QEstoque);
+            fseek(ArqFarma, -Tamanho, 1);
+            RgFarma.Preco = -1;
+            fwrite(&RgFarma, Tamanho, 1, ArqFarma);
+            break;
+        }
+    }
+
+    if(Achou == 0)
+        printf("Registro inexistente!");
+    else
+        printf("Exclusão realizada!");
+
+    fclose(ArqFarma);
+    return;
+}
 
 long int TArquivo(){
     fseek(ArqFarma, 0, 2);
-    long int R = ftell(ArqFarma)/Tamanho; 
+    long int R = ftell(ArqFarma)/Tamanho;
     return R;
 }
 
@@ -85,13 +116,13 @@ void Alterar(){
         do{
             fread(&RgFarma, Tamanho, 1, ArqFarma);
             if(strcmp(RgFarma.Nome, Farmaco) == 0 && RgFarma.Preco > 0){
-                Achou = 1; 
+                Achou = 1;
                 printf("Nome: %s\n", RgFarma.Nome);
                 printf("Valor: %.2f\n", RgFarma.Preco);
                 printf("Estoque: %d\n", RgFarma.QEstoque);
             }
         }while(!feof(ArqFarma) && (Achou == 0));
-        
+
         if(Achou == 0)
             printf("Registro inexistente!");
         else{
@@ -101,12 +132,69 @@ void Alterar(){
                 if(RgFarma.Preco < 0)
                     printf("Preço inválido!\n");
             }while(RgFarma.Preco < 0);
-            
+            do{
+                printf("Qual a nova quantidade? \n");
+                scanf("%d", &RgFarma.QEstoque);
+                if (RgFarma.QEstoque < 0)
+                    printf("Quantidade inválida\n");
+            }while(RgFarma.QEstoque < 0);
+
+            fseek(ArqFarma, -Tamanho, 1);
+            fwrite(&RgFarma, Tamanho, 1, ArqFarma);
+            printf(">>> Alteração efetuada com sucesso! <<<\n");
+        }
+
+        fclose(ArqFarma);
+        ArqFarma = fopen("Farmacos.dat", "a+b");
+    }else
+        printf("Arquivo vazio. Não existem dados a alterar!");
+
+    return 0;
+};
+
+void Consultar(){
+    printf("*** Consultar ***\n\n");
+    fseek(ArqFarma, 0, 0);
+    printf("Qual farmaco? ");
+    char Farmaco[21];
+    scanf("%s", Farmaco);
+    int Achou = 0;
+    ArqFarma - fopen("Farmacos.dat", "r+b");
+    do{
+        fread(&RgFarma, Tamanho, 1, ArqFarma);
+        if(strcmp(RgFarma.Nome, Farmaco) == 0 && RgFarma.Preco > 0){
+            Achou = 1;
+            printf("Nome: %s\n", RgFarma.Nome);
+            printf("Valor: %.2f\n", RgFarma.Preco);
+            printf("Estoque: %d\n", RgFarma.QEstoque);
+        }
+    }while(!feof(ArqFarma) && (Achou == 0));
+
+    if(Achou == 0)
+        printf("Registro inexistente!");
+    fclose(ArqFarma);
+    return;
+}
+
+void LTodos(){
+    printf("*** Listar todos ***\n\n");
+    ArqFarma = fopen("Farmacos.dat", "r+b");
+    if(ArqFarma == NULL){
+        printf("Erro ao abrir o arquivo de farmacos!\n");
+        return;
+    }
+    
+    fseek(ArqFarma, 0, 0);
+    
+    while(fread(&RgFarma, Tamanho, 1, ArqFarma)){
+        if(RgFarma.Preco > 0){
+            printf("Nome: %s\n", RgFarma.Nome);
+            printf("Valor: %.2f\n", RgFarma.Preco);
+            printf("Estoque: %d\n", RgFarma.QEstoque);
+            printf("***\n\n");
         }
     }
 };
-void Consultar(){};
-void LTodos(){};
 
 int main()
 {

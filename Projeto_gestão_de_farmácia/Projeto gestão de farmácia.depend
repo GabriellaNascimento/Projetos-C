@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1717673251 source:c:\users\gabi\documents\github\projetos-c\projeto_gestão_de_farmácia\main.c
+	<stdio.h>
+	<stdlib.h>
+	<ctype.h>
+	<string.h>
+	<locale.h>
+
