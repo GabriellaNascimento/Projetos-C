@@ -16,20 +16,22 @@ typedef struct RegMoto TpRegMoto;
 
 const int quantMotos = 50;
 TpRegMoto VZonda[50];
+//Ou struct RegMoto Vzonda[50]; -> caso não tivesse definido o typedef
 
 typedef struct TotalDia{
 	char Data[15];
 	float Valor;
 }TpTotalDia;
+
 TpTotalDia Dados;
 
 FILE *Servicos;
 FILE *Historico;
 
-long int TamanhoServ = sizeof(TpRegMoto);
+long int TamanhoServ = sizeof(TpRegMoto); //Tamanho do tipo
 long int TamanhoHist = sizeof(TpTotalDia);
 
-int Quant=-1;//Controla o preenchimento do vetor
+int Quant= -1; //Controla o preenchimento do vetor
 float total = 0;
 
 void SolicitaServico(){
@@ -276,7 +278,7 @@ void HistoricoFinanceiro(){
 	system("cls");
 	Historico = fopen("historico.dat", "a+b");
 	float valorComparacao = 0;
-	char melhorData[15];
+	char melhorData[15] = "";
 
 	printf("\n\n >>> Histórico Financeiro <<< \n\n");
 
@@ -289,25 +291,37 @@ void HistoricoFinanceiro(){
 			strcpy(melhorData, Dados.Data);
 		}
 	}
-	printf("Houve maior venda no dia %s", melhorData);
+
+	//Verificar se houve ou não, vendas para que seja possível informar a data de maior valor arrecadado
+	if(strcmp(melhorData, "") == 0)
+        printf("Ainda não houve vendas!\n");
+    else
+        printf("Houve maior venda no dia %s", melhorData);
 
 	fclose(Historico);
 }
 
 
 int main(){
-  setlocale(LC_ALL, "Portuguese");
+  setlocale(LC_ALL, "Portuguese"); //Permitir acentusções
 
-  Servicos = fopen("servicos.dat", "a+b");
+  Servicos = fopen("servicos.dat", "a+b"); //"a+b" -> se não existir, é criado
   Historico = fopen("historico.dat", "a+b");
 
   //inicializar o array de registro com os dados guardados no arquivo auxiliar
   int cont = 0;
-  while(!feof(Servicos)){
-  	fread(&VZonda[cont], TamanhoServ, 1, Servicos);
-  	cont ++;
-  };
-  Quant = cont-2;
+  while (fread(&VZonda[cont], TamanhoServ, 1, Servicos) == 1) {
+    cont++;
+  }
+  Quant = cont-1; //Variável usada para acessar os dados no vetor
+
+  /*
+  Verificar o registro dos serviços anteriores no vetor atual:
+  printf("%d\n", Quant);
+  int i;
+  for(i = 0; i <= Quant; i++){
+    printf("VZonda[%d] = %s\n", i, VZonda[i].Nome);
+  }*/
 
   int Opcao;
   system("cls");
