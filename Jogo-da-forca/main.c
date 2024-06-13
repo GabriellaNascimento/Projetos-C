@@ -2,6 +2,7 @@
 #include <locale.h> //setlocale
 #include <string.h>
 #include <stdlib.h> //system("cls")
+#include <conio.h> //_getch();
 
 const int MaxTentativa = 9;
 
@@ -13,20 +14,27 @@ int palavraMaius(char s[], const int tamanho){
     }
 }
 
+void EsperaTecla(){
+    printf("\nPressione qualquer tecla para continuar...\n");
+    _getch();
+    /*#ifdef _WIN32
+        _getch();
+    #else
+        system("stty raw");
+        getchar();
+        system("stty cooked");
+    #endif*/
+}
 //Verifica se a letra ja foi digitada e ignora a tentativa
 void letraJaDigitada(char *j, char n, int *i){
     int c = 0;
     for(c; c < 9; c++){
         if(j[c] == n){
-            printf("Essa letra já foi digitada! Tente novamente\n\n");
-            c = 0;
-            break;
+            printf("Essa letra já foi digitada! Tente novamente\n");
+            *i = *i - 1;
+            return;
         }
     }
-    if(c == 0){
-        *i = *i - 1;
-    }
-    return *i;
 }
 
 void IniciarJogo(){
@@ -91,10 +99,11 @@ void IniciarJogo(){
             }
         }
 
-        printf("\t%s\n", nova);
+        printf("\n\t%s\n", nova);
 
         if(strcmp(Palavra, nova) == 0){//Verificar se a palavra já foi advinhada
             printf("Parabéns você adivinhou a palavras em %d tentativas\n", i+1);
+            EsperaTecla();
             break;
         }else
             printf("Restam %d tentativas!\n", MaxTentativa-i-1);
@@ -117,6 +126,7 @@ void IniciarJogo(){
                     printf("Palavra errada!\n Você perdeu!\n\n");
             }else
                 printf("Você perdeu!");
+            EsperaTecla();
             break;
         }
 
@@ -132,8 +142,13 @@ int main()
 
     int opcao;
     do{
+        system("cls");
         puts("\tJOGO DA FORCA");
         puts("1 - Iniciar jogo");
+        puts("2 - 1 Jogador");
+        puts("2 - 2 Jogadores");
+        puts("2 - Ranking");
+        puts("3 - Adcionar palavra ao banco de palavras");
         puts("2 - Sair\n");
 
         printf("Digite a opção desejada: ");
