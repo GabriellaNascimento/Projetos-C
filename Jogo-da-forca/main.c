@@ -6,11 +6,27 @@
 const int MaxTentativa = 9;
 
 //Converte palavras para maiúsculas
-void palavraMaius(char s[], const int tamanho){
+int palavraMaius(char s[], const int tamanho){
     int p;
     for (p = 0; p < tamanho; p++){
         s[p] = toupper(s[p]);
     }
+}
+
+//Verifica se a letra ja foi digitada e ignora a tentativa
+void letraJaDigitada(char *j, char n, int *i){
+    int c = 0;
+    for(c; c < 9; c++){
+        if(j[c] == n){
+            printf("Essa letra já foi digitada! Tente novamente\n\n");
+            c = 0;
+            break;
+        }
+    }
+    if(c == 0){
+        *i = *i - 1;
+    }
+    return *i;
 }
 
 void IniciarJogo(){
@@ -18,8 +34,11 @@ void IniciarJogo(){
 
     printf("O jogador 2 terá %d chances de advinhar a palavra escolhida pelo jogador 1.\n\n", MaxTentativa);
 
-    //Definindo os dois jogadores
+    //Variáveis
     char Jogador1[20], Jogador2[20];
+    char Palavra[40]; //Palavra a ser advinhada
+
+    //Definindo os dois jogadores
     printf("Digite o nome do jogador 1: ");
     getchar(); //buffer do teclado
     scanf(" %[^\n]s", Jogador1);
@@ -28,7 +47,6 @@ void IniciarJogo(){
     scanf(" %[^\n]s", Jogador2);
 
     //Palavra a ser advinhada
-    char Palavra[40];
     printf("\n%s, qual a palavra a ser advinhada? ", Jogador1);
     scanf(" %[^\n]s", Palavra);
 
@@ -47,13 +65,23 @@ void IniciarJogo(){
 
     system("cls");
 
+    char LetrasDigitadas[40] = ""; //Variável para verificar as letras que já foram digitadas
     int i = 0;
     while(i <= MaxTentativa){
         printf("%s, %d° Letra: ", Jogador2, i+1);
+
         char letra;
         getchar();
         scanf(" %c", &letra);
         letra = toupper(letra);
+
+        //Verificação se a letra ja foi digitadaTa
+        letraJaDigitada(LetrasDigitadas, letra, &i);
+
+        //Salvar a letra digitada
+        int tam = strlen(LetrasDigitadas);
+        LetrasDigitadas[tam] = letra;
+        LetrasDigitadas[tam+1] = '\0';
 
         //Comparar a letra digitada com a palvra a ser advinhada
         int n;
@@ -62,24 +90,33 @@ void IniciarJogo(){
                 nova[n] = letra;
             }
         }
-        printf("\t%s", nova);
-        puts("");
 
-        if(strcmp(Palavra, nova) == 0){
+        printf("\t%s\n", nova);
+
+        if(strcmp(Palavra, nova) == 0){//Verificar se a palavra já foi advinhada
             printf("Parabéns você adivinhou a palavras em %d tentativas\n", i+1);
             break;
         }else
             printf("Restam %d tentativas!\n", MaxTentativa-i-1);
 
         if(i == 8){
-            char chute[40];
-            printf("Qual o seu chute: ");
-            scanf(" %[^\n]s", chute);
-            palavraMaius(chute, strlen(Palavra));
-            if(strcmp(Palavra, chute) == 0)
-                printf("Parabéns, você acertou!\n");
-            else
-                printf("Palavra errada!\n");
+            char escolha;
+            printf("Deseja fazer um chute? (S/N)");
+            scanf(" %c", &escolha);
+            escolha = toupper(escolha);
+            if(escolha == 'S'){
+                char chute[40];
+                printf("\nQual o seu chute: ");
+                scanf(" %[^\n]s", chute);
+
+                palavraMaius(chute, strlen(Palavra));
+
+                if(strcmp(Palavra, chute) == 0)
+                    printf("Parabéns, você acertou!\n\n");
+                else
+                    printf("Palavra errada!\n Você perdeu!\n\n");
+            }else
+                printf("Você perdeu!");
             break;
         }
 
@@ -97,8 +134,9 @@ int main()
     do{
         puts("\tJOGO DA FORCA");
         puts("1 - Iniciar jogo");
-        puts("2 - Sair");
+        puts("2 - Sair\n");
 
+        printf("Digite a opção desejada: ");
         scanf("%d", &opcao);
 
         switch(opcao){
