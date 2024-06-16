@@ -166,10 +166,10 @@ void Iniciar(char *Palavra, char *Jogador2) {
                 if (strcmp(Palavra, chute) == 0) {
                     printf("Parabéns, você acertou!\n\n");
                 } else {
-                    printf("Palavra errada!\n Você perdeu!\n\n");
+                    printf("Palavra errada!\nVocê perdeu!\nA palavra era %s\n", Palavra);
                 }
             } else {
-                printf("Você perdeu!");
+                printf("Você perdeu!\nA palavra era %s\n", Palavra);
             }
             EsperaTecla();
             break;
@@ -220,6 +220,7 @@ void UmJogador(char **palavras, int numPalavras){
     EsperaTecla();
 
     Iniciar(Palavra, Jogador);
+
 
 
 };

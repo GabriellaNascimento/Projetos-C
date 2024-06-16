@@ -166,10 +166,10 @@ void Iniciar(char *Palavra, char *Jogador2) {
                 if (strcmp(Palavra, chute) == 0) {
                     printf("Parabéns, você acertou!\n\n");
                 } else {
-                    printf("Palavra errada!\n Você perdeu!\n\n");
+                    printf("Palavra errada!\nVocê perdeu!\n\nA palavra era %s", Palavra);
                 }
             } else {
-                printf("Você perdeu!");
+                printf("Você perdeu!\nA palavra era %s", Palavra);
             }
             EsperaTecla();
             break;
@@ -205,20 +205,24 @@ void DoisJogadores() {
 
 void UmJogador(char **palavras, int numPalavras){
     system("cls");
-    printf("Em construção...\n");
-    
+
     char Jogador[40];
-    printf(Digite seu nome: )
+    printf("Digite seu nome: ");
+    getchar();
+    scanf(" %[^\n]s", Jogador);
 
     const char* Palavra; // Palavra a ser adivinhada
 
     // Escolhendo uma palavra aleatória
     Palavra = EscolhePalavraAleatoria(palavras, numPalavras);
-    printf("\n%s, uma palavra aleatória foi escolhida.\n",Palavra);
-
-    Iniciar(&Palavra, )
+    //printf("\n%s, uma palavra aleatória foi escolhida.\n",Palavra);
 
     EsperaTecla();
+
+    Iniciar(Palavra, Jogador);
+
+
+
 };
 
 void Ranking(){
