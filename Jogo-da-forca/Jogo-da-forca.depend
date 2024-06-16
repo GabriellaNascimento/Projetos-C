@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1718290133 source:c:\users\gabi\documents\github\projetos-c\jogo-da-forca\main.c
+1718581134 source:c:\users\gabi\documents\github\projetos-c\jogo-da-forca\main.c
 	<stdio.h>
 	<locale.h>
 	<string.h>

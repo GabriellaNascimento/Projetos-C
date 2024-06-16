@@ -7,7 +7,7 @@
 const int MaxTentativa = 9;
 
 //Converte palavras para maiúsculas
-int palavraMaius(char s[], const int tamanho){
+int PalavraMaius(char s[], const int tamanho){
     int p;
     for (p = 0; p < tamanho; p++){
         s[p] = toupper(s[p]);
@@ -25,6 +25,7 @@ void EsperaTecla(){
         system("stty cooked");
     #endif*/
 }
+
 //Verifica se a letra ja foi digitada e ignora a tentativa
 void letraJaDigitada(char *j, char n, int *i){
     int c = 0;
@@ -37,95 +38,139 @@ void letraJaDigitada(char *j, char n, int *i){
     }
 }
 
-void IniciarJogo(){
-    system("cls");
+// Função para contar o número de linhas em um arquivo
+int ContaLinhasArquivo(const char *nomeArquivo) {
+    FILE *file = fopen(nomeArquivo, "r");
+    if (!file) {
+        perror("Erro ao abrir o arquivo");
+        exit(EXIT_FAILURE);
+    }
 
-    printf("O jogador 2 terá %d chances de advinhar a palavra escolhida pelo jogador 1.\n\n", MaxTentativa);
+    int linhas = 0;
+    char ch;
+    while (!feof(file)) {
+        ch = fgetc(file);
+        if (ch == '\n') {
+            linhas++;
+        }
+    }
+    fclose(file);
+    return linhas;
+}
 
-    //Variáveis
-    char Jogador1[20], Jogador2[20];
-    char Palavra[40]; //Palavra a ser advinhada
+// Função para carregar as palavras de um arquivo
+char **CarregaPalavras(const char *nomeArquivo, int *numPalavras) {
+    *numPalavras = ContaLinhasArquivo(nomeArquivo);
+    FILE *file = fopen(nomeArquivo, "r");
 
-    //Definindo os dois jogadores
-    printf("Digite o nome do jogador 1: ");
-    getchar(); //buffer do teclado
-    scanf(" %[^\n]s", Jogador1);
-    printf("Digite o nome do jogador 2: ");
-    getchar();
-    scanf(" %[^\n]s", Jogador2);
+    //Verificar erro ao abrir o arquivo
+    if (!file) {
+        perror("Erro ao abrir o arquivo");
+        exit(EXIT_FAILURE);
+    }
 
-    //Palavra a ser advinhada
-    printf("\n%s, qual a palavra a ser advinhada? ", Jogador1);
-    scanf(" %[^\n]s", Palavra);
+    //Alocação de memória
+    char **palavras = malloc(*numPalavras * sizeof(char *));
+    if (!palavras) {
+        perror("Erro ao alocar memória");
+        exit(EXIT_FAILURE);
+    }
 
-    //Criando nova string para exibir o resultado, string de verificação
+    char buffer[100];
+    for (int i = 0; i < *numPalavras; i++) {
+        fgets(buffer, sizeof(buffer), file);
+        buffer[strcspn(buffer, "\n")] = 0; // Remover o caractere de nova linha
+        palavras[i] = malloc(strlen(buffer) + 1);
+        if (!palavras[i]) {
+            perror("Erro ao alocar memória");
+            exit(EXIT_FAILURE);
+        }
+        strcpy(palavras[i], buffer);
+    }
+    fclose(file);
+    return palavras;
+}
+
+// Função para escolher uma palavra aleatória da lista carregada
+const char* EscolhePalavraAleatoria(char **palavras, int numPalavras) {
+    srand(time(NULL)); // Inicializa a semente do gerador de números aleatórios
+    int indice = rand() % numPalavras;
+    return palavras[indice];
+}
+
+
+void Iniciar(char *Palavra, char *Jogador2) {
+    // Criando nova string para exibir o resultado, string de verificação
     int quantCar = strlen(Palavra);
-    char nova[quantCar];
+    char nova[quantCar + 1];
 
-    //Converter a palavra para maiúsculas para facilitar a verificação
-    //Inicializando a string de verificação
-    int p;
-    for (p = 0; p < strlen(Palavra); p++){
+    // Converter a palavra para maiúsculas para facilitar a verificação
+    // Inicializando a string de verificação
+    for (int p = 0; p < quantCar; p++) {
         Palavra[p] = toupper(Palavra[p]);
         nova[p] = '_';
     }
-    nova[p] = '\0'; //Garantir que a string seja finalizada corretamente -> correção de erro
+    nova[quantCar] = '\0'; // Garantir que a string seja finalizada corretamente -> correção de erro
 
     system("cls");
 
-    char LetrasDigitadas[40] = ""; //Variável para verificar as letras que já foram digitadas
+    char LetrasDigitadas[40] = ""; // Variável para verificar as letras que já foram digitadas
     int i = 0;
-    while(i <= MaxTentativa){
-        printf("%s, %d° Letra: ", Jogador2, i+1);
+    while (i <= MaxTentativa) {
+        printf("%s, %dª Letra: ", Jogador2, i + 1);
 
         char letra;
         getchar();
         scanf(" %c", &letra);
         letra = toupper(letra);
 
-        //Verificação se a letra ja foi digitadaTa
+        // Verificação se a letra ja foi digitada
         letraJaDigitada(LetrasDigitadas, letra, &i);
 
-        //Salvar a letra digitada
+        // Salvar a letra digitada
         int tam = strlen(LetrasDigitadas);
         LetrasDigitadas[tam] = letra;
-        LetrasDigitadas[tam+1] = '\0';
+        LetrasDigitadas[tam + 1] = '\0';
 
-        //Comparar a letra digitada com a palvra a ser advinhada
-        int n;
-        for(n = 0; n < strlen(Palavra); n++){
-            if(Palavra[n] == letra){
+        // Comparar a letra digitada com a palavra a ser advinhada
+        for (int n = 0; n < quantCar; n++) {
+            if (Palavra[n] == letra) {
                 nova[n] = letra;
             }
         }
 
         printf("\n\t%s\n", nova);
 
-        if(strcmp(Palavra, nova) == 0){//Verificar se a palavra já foi advinhada
-            printf("Parabéns você adivinhou a palavras em %d tentativas\n", i+1);
+        if (strcmp(Palavra, nova) == 0) { // Verificar se a palavra já foi advinhada
+            printf("Parabéns, você adivinhou a palavra em %d tentativas\n", i + 1);
             EsperaTecla();
             break;
-        }else
-            printf("Restam %d tentativas!\n", MaxTentativa-i-1);
+        } else {
+            printf("Restam %d tentativas!\n", MaxTentativa - i - 1);
+        }
 
-        if(i == 8){
+        if (i == 8) {
             char escolha;
             printf("Deseja fazer um chute? (S/N)");
+            getchar();
             scanf(" %c", &escolha);
             escolha = toupper(escolha);
-            if(escolha == 'S'){
+            if (escolha == 'S') {
                 char chute[40];
                 printf("\nQual o seu chute: ");
+                getchar();
                 scanf(" %[^\n]s", chute);
 
-                palavraMaius(chute, strlen(Palavra));
+                PalavraMaius(chute, strlen(chute));
 
-                if(strcmp(Palavra, chute) == 0)
+                if (strcmp(Palavra, chute) == 0) {
                     printf("Parabéns, você acertou!\n\n");
-                else
+                } else {
                     printf("Palavra errada!\n Você perdeu!\n\n");
-            }else
+                }
+            } else {
                 printf("Você perdeu!");
+            }
             EsperaTecla();
             break;
         }
@@ -133,6 +178,64 @@ void IniciarJogo(){
         puts("\n");
         i++;
     }
+}
+
+void DoisJogadores() {
+    system("cls");
+
+    printf("O jogador 2 terá %d chances de advinhar a palavra escolhida pelo jogador 1.\n\n", MaxTentativa);
+
+    // Variáveis
+    char Jogador1[20], Jogador2[20];
+    char Palavra[40]; // Palavra a ser advinhada
+
+    // Definindo os dois jogadores
+    printf("Digite o nome do jogador 1: ");
+    scanf(" %[^\n]s", Jogador1);
+    getchar(); // Limpar buffer
+    printf("Digite o nome do jogador 2: ");
+    scanf(" %[^\n]s", Jogador2);
+
+    // Palavra a ser advinhada
+    printf("\n%s, qual a palavra a ser advinhada? ", Jogador1);
+    scanf(" %[^\n]s", Palavra);
+
+    Iniciar(Palavra, Jogador2);
+}
+
+void UmJogador(char **palavras, int numPalavras){
+    system("cls");
+
+    char Jogador[40];
+    printf("Digite seu nome: ");
+    getchar();
+    scanf(" %[^\n]s", Jogador);
+
+    const char* Palavra; // Palavra a ser adivinhada
+
+    // Escolhendo uma palavra aleatória
+    Palavra = EscolhePalavraAleatoria(palavras, numPalavras);
+    //printf("\n%s, uma palavra aleatória foi escolhida.\n",Palavra);
+
+    EsperaTecla();
+
+    Iniciar(Palavra, Jogador);
+
+
+};
+
+void Ranking(){
+    system("cls");
+    printf("Em construção...\n");
+
+    EsperaTecla();
+};
+
+void NovaPalavra(){
+    system("cls");
+    printf("Em construção...\n");
+
+    EsperaTecla();
 };
 
 int main()
@@ -140,25 +243,32 @@ int main()
     setlocale(LC_ALL, "Portuguese"); //Acentuações
     system("cls"); //Limpar tela
 
+    int numPalavras;
+    char **palavras = CarregaPalavras("palavras.txt", &numPalavras);
+
     int opcao;
     do{
         system("cls");
-        puts("\tJOGO DA FORCA");
-        puts("1 - Iniciar jogo");
-        puts("2 - 1 Jogador");
+        puts("\t> > > JOGO DA FORCA < < <\n");
+        puts("1 - 1 Jogador");
         puts("2 - 2 Jogadores");
-        puts("2 - Ranking");
-        puts("3 - Adcionar palavra ao banco de palavras");
-        puts("2 - Sair\n");
+        puts("3 - Ranking");
+        puts("4 - Adcionar palavra ao banco de palavras");
+        puts("5 - Sair\n");
 
         printf("Digite a opção desejada: ");
         scanf("%d", &opcao);
 
         switch(opcao){
-            case 1: IniciarJogo(); break;
-            case 2: break;
-            default: printf("Opção inválida!\n"); break;
+            case 1: UmJogador(palavras, numPalavras); break;
+            case 2: DoisJogadores(); break;
+            case 3: Ranking(); break;
+            case 4: NovaPalavra(); break;
+            case 5: break;
+            default: printf("Opção inválida!\n");
+                     EsperaTecla();
+                     break;
         }
-    }while(opcao == 1);
+    }while(opcao != 5);
     return 0;
 }
