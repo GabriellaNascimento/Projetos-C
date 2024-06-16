@@ -166,10 +166,10 @@ void Iniciar(char *Palavra, char *Jogador2) {
                 if (strcmp(Palavra, chute) == 0) {
                     printf("Parabéns, você acertou!\n\n");
                 } else {
-                    printf("Palavra errada!\nVocê perdeu!\n\nA palavra era %s", Palavra);
+                    printf("Palavra errada!\nVocê perdeu!\nA palavra era %s\n", Palavra);
                 }
             } else {
-                printf("Você perdeu!\nA palavra era %s", Palavra);
+                printf("Você perdeu!\nA palavra era %s\n", Palavra);
             }
             EsperaTecla();
             break;
@@ -271,5 +271,12 @@ int main()
                      break;
         }
     }while(opcao != 5);
+
+    // Libera a memória alocada
+    for (int i = 0; i < numPalavras; i++) {
+        free(palavras[i]);
+    }
+    free(palavras);
+
     return 0;
 }

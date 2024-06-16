@@ -271,5 +271,12 @@ int main()
                      break;
         }
     }while(opcao != 5);
+
+     // Libera a memória alocada
+    for (int i = 0; i < numPalavras; i++) {
+        free(palavras[i]);
+    }
+    free(palavras);
+
     return 0;
 }
