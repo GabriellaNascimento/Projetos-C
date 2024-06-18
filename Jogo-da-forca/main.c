@@ -3,11 +3,12 @@
 #include <string.h>
 #include <stdlib.h> //system("cls")
 #include <conio.h> //_getch();
+#include <errno.h> // perror
 
 const int MaxTentativa = 9;
 
 //Converte palavras para maiúsculas
-int PalavraMaius(char s[], const int tamanho){
+void PalavraMaius(char s[], const int tamanho){
     int p;
     for (p = 0; p < tamanho; p++){
         s[p] = toupper(s[p]);
@@ -27,7 +28,7 @@ void EsperaTecla(){
 }
 
 //Verifica se a letra ja foi digitada e ignora a tentativa
-void letraJaDigitada(char *j, char n, int *i){
+void LetraJaDigitada(char *j, char n, int *i){
     int c = 0;
     for(c; c < 9; c++){
         if(j[c] == n){
@@ -40,20 +41,22 @@ void letraJaDigitada(char *j, char n, int *i){
 
 // Função para contar o número de linhas em um arquivo
 int ContaLinhasArquivo(const char *nomeArquivo) {
-    FILE *file = fopen(nomeArquivo, "r");
-    if (!file) {
-        perror("Erro ao abrir o arquivo");
-        exit(EXIT_FAILURE);
+    FILE *file = fopen(nomeArquivo, "r"); //Abre arquivo no modo de leitura e deve existir
+
+    if (!file) { //Retorna 1 se file = NULL
+        perror("Erro ao abrir o arquivo"); //Mensagem + descrição do erro
+        return 1;
     }
 
     int linhas = 0;
     char ch;
-    while (!feof(file)) {
-        ch = fgetc(file);
+    while (!feof(file)){ //Enquanto não for fim do arquivo
+        ch = fgetc(file); //Ler cada caracter do arquivo até identificar uma nova linha
         if (ch == '\n') {
             linhas++;
         }
     }
+
     fclose(file);
     return linhas;
 }
@@ -125,7 +128,7 @@ void Iniciar(char *Palavra, char *Jogador2) {
         letra = toupper(letra);
 
         // Verificação se a letra ja foi digitada
-        letraJaDigitada(LetrasDigitadas, letra, &i);
+        LetraJaDigitada(LetrasDigitadas, letra, &i);
 
         // Salvar a letra digitada
         int tam = strlen(LetrasDigitadas);
@@ -151,7 +154,7 @@ void Iniciar(char *Palavra, char *Jogador2) {
 
         if (i == 8) {
             char escolha;
-            printf("Deseja fazer um chute? (S/N)");
+            printf("Deseja fazer um chute?(S/N) ");
             getchar();
             scanf(" %c", &escolha);
             escolha = toupper(escolha);
@@ -166,7 +169,7 @@ void Iniciar(char *Palavra, char *Jogador2) {
                 if (strcmp(Palavra, chute) == 0) {
                     printf("Parabéns, você acertou!\n\n");
                 } else {
-                    printf("Palavra errada!\nVocê perdeu!\nA palavra era %s\n", Palavra);
+                    printf("Palavra errada! Você perdeu!\nA palavra era %s\n", Palavra);
                 }
             } else {
                 printf("Você perdeu!\nA palavra era %s\n", Palavra);
@@ -272,7 +275,7 @@ int main()
         }
     }while(opcao != 5);
 
-     // Libera a memória alocada
+    // Libera a memória alocada
     for (int i = 0; i < numPalavras; i++) {
         free(palavras[i]);
     }
